@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Infinite Wiki</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi&display=swap" rel="stylesheet">
+    <style>
+      @keyframes blink {
+        from, to { opacity: 1 }
+        50% { opacity: 0; }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: -468px 0; }
+        100% { background-position: 468px 0; }
+      }
+
+      body {
+        background-color: #fcfcfc;
+        color: #222222;
+        font-family: 'Kosugi', sans-serif;
+        font-size: 1.1rem;
+        line-height: 1.7; /* Slightly increased for better readability */
+        margin: 0;
+        padding: 2rem 2rem 8rem 2rem;
+        transition: background-color 0.3s ease;
+      }
+      #root {
+        max-width: 65ch;
+        margin: auto;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        font-size: 1em;
+        margin: 0;
+        font-weight: normal;
+      }
+      button {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
+      button:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+      
+      .content-loaded {
+        animation: fadeIn 0.5s ease-out;
+      }
+      
+      .interactive-word {
+        color: #222222;
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        transition: color 0.2s ease, text-decoration-color 0.2s ease, transform 0.2s ease;
+      }
+      .interactive-word:hover {
+        color: #0055ff;
+        text-decoration-color: #0055ff;
+      }
+      .footer-text {
+        font-size: 0.9em;
+        color: #999999;
+      }
+      .footer-text a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.2s ease-in-out;
+      }
+      .footer-text a:hover {
+        color: #0055ff;
+        text-decoration: underline;
+      }
+      .ascii-art {
+        font-family: monospace;
+        text-align: left;
+        white-space: pre;
+        color: #999999;
+        margin: 2rem 0;
+        line-height: 1.1;
+        font-size: 0.8em;
+        padding: 1rem;
+        border: 1px solid #f0f0f0;
+        border-radius: 4px;
+        background-color: #ffffff;
+      }
+      .blinking-cursor {
+        animation: blink 1s step-end infinite;
+        color: #0055ff;
+      }
+      
+      /* Search Bar Styles */
+      .search-container {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+
+      .nav-buttons {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .nav-button {
+        background: none;
+        border: none;
+        padding: 0.5rem 0.2rem;
+        font: inherit;
+        font-size: 1.2em;
+        line-height: 1;
+        color: #222222;
+        user-select: none;
+      }
+
+      .nav-button:hover:not(:disabled) {
+        color: #0055ff;
+      }
+
+      .nav-button:disabled {
+        color: #dddddd;
+        cursor: not-allowed;
+      }
+
+      .search-form {
+        flex-grow: 1;
+        position: relative;
+      }
+      .search-form::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #cccccc;
+        transform: scaleX(1);
+        transition: transform 0.3s ease, background-color 0.3s ease;
+      }
+      .search-form:focus-within::after {
+        background-color: #0055ff;
+      }
+
+
+      .search-input {
+        width: 100%;
+        padding: 0.5rem 0.2rem;
+        font: inherit;
+        color: inherit;
+        border: none;
+        border-bottom: 1px solid transparent;
+        background-color: transparent;
+        box-sizing: border-box;
+        outline: none;
+      }
+      
+      .search-input:disabled {
+        color: #cccccc;
+      }
+
+      .search-input::placeholder {
+        color: #999999;
+        opacity: 1;
+      }
+      
+      .random-button {
+        padding: 0.5rem 0;
+        color: #222222;
+        white-space: nowrap;
+      }
+      
+      .random-button:hover:not(:disabled) {
+        color: #0055ff;
+      }
+
+      .random-button:disabled {
+        color: #dddddd;
+        cursor: not-allowed;
+      }
+
+      /* History Display Styles */
+      .history-container {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .history-header h2 {
+        font-weight: bold;
+      }
+
+      .clear-button {
+        font-size: 0.9em;
+        color: #999999;
+      }
+
+      .clear-button:hover {
+        color: #e63946;
+        text-decoration: underline;
+      }
+
+      .history-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1rem;
+      }
+
+      .history-item {
+        font-size: 0.9em;
+        color: #999999;
+        text-decoration: none;
+      }
+
+      .history-item:hover:not(:disabled) {
+        color: #0055ff;
+        text-decoration: underline;
+      }
+
+      .history-item.active {
+        color: #222222;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: default;
+      }
+      
+      .history-item.active:hover {
+          transform: none;
+      }
+
+      .sticky-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        text-align: center;
+        padding: 1.5rem 0;
+        background-color: #fcfcfc;
+        border-top: 1px solid #f0f0f0;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.7.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

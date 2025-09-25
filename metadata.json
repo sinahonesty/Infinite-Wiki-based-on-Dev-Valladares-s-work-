@@ -1,0 +1,6 @@
+{
+  "name": "Infinite Wiki (DV)",
+  "description": "Explore an infinite wiki where every word is a hyperlink to descriptions generated in real-time. (based on Dev Valladares's work)",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
